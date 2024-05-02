@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Test') {
+        /*
+
+        stage('Build') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -11,8 +13,28 @@ pipeline {
             }
             steps {
                 sh '''
-                    # Ensure dependencies are installed and test
-                    npm install
+                    ls -la
+                    node --version
+                    npm --version
+                    npm ci
+                    npm run build
+                    ls -la
+                '''
+            }
+        }
+        */
+
+        stage('Test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+
+            steps {
+                sh '''
+                    #test -f build/index.html
                     npm test
                 '''
             }
@@ -25,13 +47,13 @@ pipeline {
                     reuseNode true
                 }
             }
+
             steps {
                 sh '''
-                    # Start the server, wait for it to be ready, and then run end-to-end tests
                     npm install serve
                     node_modules/.bin/serve -s build &
                     sleep 10
-                    npx playwright test
+                    npx playwright test --reporter=html
                 '''
             }
         }
