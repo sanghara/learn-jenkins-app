@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     stages {
-        /*
-
         stage('Build') {
             agent {
                 docker {
@@ -22,7 +20,6 @@ pipeline {
                 '''
             }
         }
-        */
 
         stage('Test') {
             agent {
@@ -31,10 +28,8 @@ pipeline {
                     reuseNode true
                 }
             }
-
             steps {
                 sh '''
-                    #test -f build/index.html
                     npm test
                 '''
             }
@@ -47,10 +42,11 @@ pipeline {
                     reuseNode true
                 }
             }
-
             steps {
                 sh '''
+                    npm ci
                     npm install serve
+                    npm run build
                     node_modules/.bin/serve -s build &
                     sleep 10
                     npx playwright test --reporter=html
